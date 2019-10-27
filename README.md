@@ -23,7 +23,7 @@
 
 
 # Miscellaneous 
-   1.  H2 database is used, because it's easily integrated with spring Boot (see poom.xml file) and configured in `application.properties` and I create simple query in `data.sql` to insert inital data into the DB.
+   1.  H2 database is used, because it's easily integrated with spring Boot (see pom.xml file) and configured in `application.properties` and I create simple query in `data.sql` to insert inital data into the DB.
    2.  I extends inteface of `PagingAndSortingRepository` which extends already interface of `CrudRepository` which allows me to have all Crud operations and Paging and sorting operations
    3.  no need to make implementation for  `CarRepository` interface, don't worry Spring Boot take care about it .
    4. first I handled the validation of input fields in `Service layer ` by throwing Exception handling, but I modified it lately by getting ValidationErrorMessages , but in `Controller` layer. the validation functionality should be moved in `Service` layer.and send    `ValidationErrorMessages` as a Json object with field(key) andmessage(value).
