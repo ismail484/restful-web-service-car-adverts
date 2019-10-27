@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,16 +26,13 @@ public class CarServiceImpl implements CarService {
     @Override
     public Car retrieveCar(long id) {
         Optional<Car> car = carRepository.findById(id);
-        Car myCar = car.orElseThrow(()-> new CarNotFoundException("CAR NOT Found Error!...please try again with another car"));
+        Car myCar = car.orElseThrow(() -> new CarNotFoundException("CAR NOT Found Error!...please try again with another car"));
         return myCar;
     }
 
     @Override
-    public void saveCar(Car car) {
-        this.validateInputFields(car);
-
-         carRepository.save(car);
-
+    public Car saveCar(Car car) {
+        return carRepository.save(car);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class CarServiceImpl implements CarService {
 
         Optional<Car> car = carRepository.findById(id);
 
-        if(!car.isPresent()){
+        if (!car.isPresent()) {
             throw new CarNotFoundException("CAR NOT Found Error!, Car is already deleted!");
         }
         carRepository.deleteById(id);
@@ -55,19 +53,31 @@ public class CarServiceImpl implements CarService {
         return sortedCars;
     }
 
-    private void validateInputFields(Car car){
+    public List<String> validateInputFields(Car car) {
         boolean newCar = car.isNewCar();
+        List<String> validationErrors = new ArrayList<>();
         int mileage = car.getMileage();
         Optional<Date> firstRegistration = Optional.ofNullable(car.getFirstRegistration());
         Optional<String> title = Optional.ofNullable(car.getTitle());
         Optional<Fuel> fuel = Optional.ofNullable(car.getFuel());
         Optional<String> price = Optional.ofNullable(car.getPrice());
-        if(!title.isPresent() || !fuel.isPresent() || !price.isPresent() ){
-            throw new ValidationErrorInputFieldsException("VALIDATION ERROR!, please enter all required fields ");
+        if (!title.isPresent()) {
+            validationErrors.add("title field is requiered ");
         }
-        if(!newCar &&(mileage == 0 || !firstRegistration.isPresent())){
-            throw new ValidationErrorInputFieldsException("VALIDATION ERROR!, mileage and firstRegistration are required fields  ");
+        if (!price.isPresent()) {
+            validationErrors.add("fuel is requiered field");
         }
+        if (!fuel.isPresent() || !price.isPresent()) {
+            validationErrors.add("fuel is requiered field");
+        }
+        if (!newCar && mileage == 0) {
+            validationErrors.add("mileage is required field");
+        }
+        if (!newCar && !firstRegistration.isPresent()) {
+            validationErrors.add("firstRegistration is required field");
+        }
+
+        return validationErrors;
 
 
     }

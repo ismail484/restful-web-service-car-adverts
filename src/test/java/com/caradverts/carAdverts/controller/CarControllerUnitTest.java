@@ -10,18 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-
-import static net.bytebuddy.matcher.ElementMatchers.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.hamcrest.Matchers.hasSize;
-
-
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,8 +32,10 @@ public class CarControllerUnitTest {
     @MockBean
     CarService carService;
 
+
     /**
      * Tests the retrieval of car list
+     *
      * @throws Exception if the update operation of a service fails
      */
 
@@ -53,6 +49,7 @@ public class CarControllerUnitTest {
 
     /**
      * Tests the retrieval of sorted cars as list
+     *
      * @throws Exception if the update operation of a service fails
      */
 
@@ -67,6 +64,7 @@ public class CarControllerUnitTest {
 
     /**
      * Tests the retrieval of a single car by ID.
+     *
      * @throws Exception if the update operation of a service fails
      */
     @Test
@@ -80,6 +78,7 @@ public class CarControllerUnitTest {
 
     /**
      * Tests the deletion of a single car by ID.
+     *
      * @throws Exception if the delete operation of the service fails
      */
     @Test
@@ -93,21 +92,24 @@ public class CarControllerUnitTest {
 
     /**
      * Tests the update of a single car by ID.
+     *
      * @throws Exception if the update operation of the service fails
      */
     @Test
     public void updateCar() throws Exception {
-        Car car = getACar();
-        car.setId((long) 3);
+        Car savedCar = getACar();
+        savedCar.setPrice("20000$");
+        when(carService.saveCar(savedCar)).thenReturn(savedCar);
         mockMvc.perform(
-                put("/car/3", car.getId())
+                put("/car/" + savedCar.getId().toString(), savedCar.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(car)))
+                        .content(asJsonString(savedCar)))
                 .andExpect(status().isOk());
     }
 
     /**
      * Tests the addition of a single car by ID.
+     *
      * @throws Exception if the update operation of the service fails
      */
 
@@ -121,18 +123,19 @@ public class CarControllerUnitTest {
                 .andExpect(status().isOk());
     }
 
-
-
-    private Car getACar(){
+    private Car getACar() {
         Car car = new Car();
+        car.setId((long) 1);
         car.setTitle("BMW");
         car.setPrice("100000$");
         car.setFuel(Fuel.DIESEL);
         car.setNewCar(true);
-        return car;
+        when(carService.saveCar(car)).thenReturn(car);
+        return carService.saveCar(car);
     }
 
-    private Car getANewCar(){
+
+    private Car getANewCar() {
         Car car = new Car();
         car.setTitle("Ferari");
         car.setPrice("100000$");
@@ -141,10 +144,19 @@ public class CarControllerUnitTest {
         return car;
     }
 
+    private Car getANewCarWithError() {
+        Car car = new Car();
+        car.setTitle("Ferari");
+        car.setPrice("100000$");
+        car.setFuel(Fuel.GASOLINE);
+        car.setNewCar(false);
+        return car;
+    }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
+        } catch ( Exception e ) {
             throw new RuntimeException(e);
         }
     }

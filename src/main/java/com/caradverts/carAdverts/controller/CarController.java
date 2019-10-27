@@ -32,6 +32,7 @@ public class CarController {
         List<Car> cars = carService.retrieveAllCars();
         return new ResponseEntity<>(cars, HttpStatus.OK);
     }
+
     @GetMapping("/car/{id}")
     public ResponseEntity<Car> getCarByID(@PathVariable Long id) {
         Car car = carService.retrieveCar(id);
@@ -40,23 +41,35 @@ public class CarController {
 
 
     @PutMapping("/car/{id}")
-    public ResponseEntity<Car> updateCar(@PathVariable Long id, @Valid @RequestBody Car car) {
+    public ResponseEntity<?> updateCar(@PathVariable Long id, @Valid @RequestBody Car car) {
 
         //Set the id of the passed car object to the passed `id`
         car.setId(id);
 
-        carService.saveCar(car);
+        List<String> validationErrors = carService.validateInputFields(car);
 
-         return new ResponseEntity<>(car, HttpStatus.OK);
+        if (validationErrors.size() == 0) {
+            Car res = carService.saveCar(car);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } else {
+            List<String> res = validationErrors;
+            return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+        }
     }
 
 
     @PostMapping("/addcar")
-    public ResponseEntity<Car> addCar(@Valid @RequestBody Car car) {
+    public ResponseEntity<?> addCar(@Valid @RequestBody Car car) {
 
-        carService.saveCar(car);
+        List<String> validationErrors = carService.validateInputFields(car);
 
-        return  new ResponseEntity<>(car, HttpStatus.OK);
+        if (validationErrors.size() == 0) {
+            Car res = carService.saveCar(car);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } else {
+            List<String> res = validationErrors;
+            return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/car/{id}")
