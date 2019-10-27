@@ -9,10 +9,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +34,7 @@ public class CarAdvertsApplicationTest {
     private static final String SERVER = "http://localhost:";
     private static final String GET_ALL_CARS_URL = "/cars";
     private static final String GET_CAR_ENDPOINT_URL = "/car/{id}";
-    private static final String Add_CAR_ENDPOINT_URL = "/cars";
+    private static final String Add_CAR_ENDPOINT_URL = "/addcar";
     private static final String UPDATE_CAR_ENDPOINT_URL = "/car/{id}";
     private static final String DELETE_CAR_ENDPOINT_URL = "/car/{id}";
 
@@ -61,8 +66,8 @@ public class CarAdvertsApplicationTest {
     @Test
     public void addCar() {
         Car car = getANewCar();
-        Car response = this.restTemplate.postForObject(SERVER + port +Add_CAR_ENDPOINT_URL, car, Car.class);
-
+        ResponseEntity<Car> response  = this.restTemplate.postForEntity(SERVER + port +Add_CAR_ENDPOINT_URL, car, Car.class);
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
         }
 
     @Test
@@ -70,15 +75,23 @@ public class CarAdvertsApplicationTest {
         Map < String, String > params = new HashMap < String, String > ();
         params.put("id", "1");
         Car car = getACar();
-         this.restTemplate.put(SERVER + port +UPDATE_CAR_ENDPOINT_URL, car, params);
-
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<Car> requestEntity = new HttpEntity<Car>(car, headers);
+        ResponseEntity<Car> response = restTemplate.exchange(SERVER + port +UPDATE_CAR_ENDPOINT_URL, HttpMethod.PUT, requestEntity, Car.class, params);
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
     }
 
     @Test
     public void deleteCar() {
         Map < String, String > params = new HashMap < String, String > ();
         params.put("id", "1");
-        this.restTemplate.delete(SERVER + port +DELETE_CAR_ENDPOINT_URL, params);
+        Car car = getACar();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<Car> requestEntity = new HttpEntity<Car>(car, headers);
+        ResponseEntity<Car> response = restTemplate.exchange(SERVER + port +UPDATE_CAR_ENDPOINT_URL, HttpMethod.DELETE, requestEntity, Car.class, params);
+        assertThat(response.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
 
     }
 

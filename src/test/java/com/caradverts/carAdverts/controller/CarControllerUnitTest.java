@@ -48,8 +48,21 @@ public class CarControllerUnitTest {
         mockMvc.perform(get("/cars/"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
-
         verify(carService, times(1)).retrieveAllCars();
+    }
+
+    /**
+     * Tests the retrieval of sorted cars as list
+     * @throws Exception if the update operation of a service fails
+     */
+
+    @Test
+    public void getSortedCars() throws Exception {
+        mockMvc.perform(get("/sortedcars/mileage"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+
+        verify(carService, times(1)).retrieveAllCarsSorted("mileage");
     }
 
     /**
@@ -101,7 +114,7 @@ public class CarControllerUnitTest {
     @Test
     public void addMyCar() throws Exception {
         Car car = getANewCar();
-        mockMvc.perform(post("/cars")
+        mockMvc.perform(post("/addcar")
                 .content(asJsonString(car))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
