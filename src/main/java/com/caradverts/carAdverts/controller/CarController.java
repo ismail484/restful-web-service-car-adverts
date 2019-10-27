@@ -51,7 +51,7 @@ public class CarController {
     }
 
 
-    @PostMapping("/cars")
+    @PostMapping("/addcar")
     public ResponseEntity<Car> addCar(@Valid @RequestBody Car car) {
 
         carService.saveCar(car);
