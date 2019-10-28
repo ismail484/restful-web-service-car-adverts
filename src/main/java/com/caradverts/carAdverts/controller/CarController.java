@@ -46,6 +46,7 @@ public class CarController {
         //Set the id of the passed car object to the passed `id`
         car.setId(id);
 
+        //To Do:should be moved to service layer
         List<String> validationErrors = carService.validateInputFields(car);
 
         if (validationErrors.size() == 0) {
@@ -61,6 +62,7 @@ public class CarController {
     @PostMapping("/addcar")
     public ResponseEntity<?> addCar(@Valid @RequestBody Car car) {
 
+        //To Do:should be moved to service layer
         List<String> validationErrors = carService.validateInputFields(car);
 
         if (validationErrors.size() == 0) {

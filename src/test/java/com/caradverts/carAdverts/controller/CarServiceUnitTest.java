@@ -14,6 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -135,6 +137,21 @@ public class CarServiceUnitTest {
 
     }
 
+
+    /**
+     * Tests the functionality of validationInputFields
+     *
+     * validationErrors will be NotNull
+     */
+    @Test()
+    public void validationInputFields() throws Exception {
+        Car car = getCarWithErrors() ;
+        List<String> validationErrors = carService.validateInputFields(car);
+        assertThat(validationErrors, hasSize(2));
+
+
+    }
+
     private void deleteLastCar(long id) {
         carService.deleteCarById(id);
     }
@@ -146,5 +163,14 @@ public class CarServiceUnitTest {
         car.setFuel(Fuel.DIESEL);
         car.setNewCar(true);
         return carService.saveCar(car);
+    }
+
+    private Car getCarWithErrors() {
+        Car car = new Car();
+        car.setTitle("Toyota");
+        car.setPrice("300000$");
+        car.setFuel(Fuel.DIESEL);
+        car.setNewCar(false);
+        return car;
     }
 }
