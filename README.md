@@ -2,7 +2,7 @@
 
 # Description
   
-  ###  RESTful web-service for CarAdverts written using Java Spring Boot
+  ###  RESTful web-service for CarAdverts written using Java Spring Boot provide the following functionalities:
 * have functionality to return list of all car adverts;
 * support sorting by any field specified by query parameter, default sorting - by **id**;
 * have functionality to return data for single car advert by id;
